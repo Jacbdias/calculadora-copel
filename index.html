@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Copel - CPLE3 vs CPLE6</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1em;
+        }
+        
+        .spreadsheet {
+            padding: 30px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 12px 15px;
+            text-align: center;
+            font-weight: 600;
+            color: #495057;
+            min-width: 120px;
+        }
+        
+        td {
+            border: 1px solid #dee2e6;
+            padding: 12px 15px;
+            text-align: center;
+            background: white;
+        }
+        
+        .row-header {
+            background: #f8f9fa !important;
+            font-weight: 600;
+            text-align: left !important;
+            color: #495057;
+            min-width: 200px;
+        }
+        
+        .input-cell {
+            background: #fff3cd !important;
+        }
+        
+        .calculated-cell {
+            background: #e7f3ff !important;
+            font-weight: 600;
+        }
+        
+        .recommendation-cell {
+            background: #e8f5e8 !important;
+            font-weight: bold;
+            font-size: 1em;
+            padding: 15px !important;
+        }
+        
+        .recommendation-cell.cple3-better {
+            background: #fff3cd !important;
+        }
+        
+        input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-size: 14px;
+            padding: 5px;
+            font-weight: 600;
+        }
+        
+        input:focus {
+            outline: 2px solid #4285f4;
+            border-radius: 4px;
+        }
+        
+        .positive { color: #28a745; }
+        .negative { color: #dc3545; }
+        .neutral { color: #6c757d; }
+        
+        .instructions {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #4285f4;
+        }
+        
+        .instructions h3 {
+            color: #1a73e8;
+            margin-bottom: 10px;
+        }
+        
+        .share-section {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            border: 2px solid #90ee90;
+        }
+        
+        .share-url {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+            font-size: 0.9em;
+            word-break: break-all;
+        }
+        
+        .copy-url-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+        }
+        
+        .copy-url-btn:hover {
+            background: #218838;
+        }
+        
+        .conversion-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .conversion-info h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header {
+                padding: 15px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .spreadsheet {
+                padding: 20px;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+            }
+        }
+        
+        .auto-update-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+            margin-left: 8px;
+            animation: blink 2s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .last-updated {
+            font-size: 0.8em;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Calculadora Migração Copel</h1>
+            <p>CPLE3 vs CPLE6 - Análise Novo Mercado B3 <span class="auto-update-indicator"></span></p>
+        </div>
+        
+        <div class="spreadsheet">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 250px;">Descrição</th>
+                            <th style="width: 150px;">Valor (R$)</th>
+                            <th style="width: 200px;">Observação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="row-header">💰 Preço CPLE3 (ON)</td>
+                            <td class="input-cell">
+                                <input type="number" id="cple3" step="0.01" placeholder="Ex: 9.50" oninput="calculate()">
+                            </td>
+                            <td>Cotação atual mercado</td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">💰 Preço CPLE6 (PNB)</td>
+                            <td class="input-cell">
+                                <input type="number" id="cple6" step="0.01" placeholder="Ex: 9.20" oninput="calculate()">
+                            </td>
+                            <td>Cotação atual mercado</td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">📈 Valor Teórico CPLE6</td>
+                            <td class="calculated-cell" id="theoretical">R$ 0,00</td>
+                            <td>CPLE3 + R$ 0,827</td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">📊 Spread (Diferença)</td>
+                            <td class="calculated-cell" id="spread">R$ 0,00</td>
+                            <td>CPLE6 - Valor Teórico</td>
+                        </tr>
+                        <tr>
+                            <td class="row-header">📉 Desconto/Prêmio (%)</td>
+                            <td class="calculated-cell" id="percentage">0,00%</td>
+                            <td>% de desconto/prêmio</td>
+                        </tr>
+                        <tr>
+                            <td class="row-header" style="font-size: 1.1em; font-weight: bold;">🎯 RECOMENDAÇÃO</td>
+                            <td class="recommendation-cell" id="recommendation" colspan="2">Digite os preços para ver a recomendação</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="last-updated" id="lastUpdated">Aguardando dados...</div>
+            
+            <div class="conversion-info">
+                <h4>ℹ️ Como funciona a conversão:</h4>
+                <p><strong>Cada CPLE6 (PNB) será convertida em:</strong></p>
+                <ul style="margin: 8px 0 0 20px;">
+                    <li>1 ação ordinária (ON)</li>
+                    <li>1,067 ações PNC → resgatadas por R$ 0,7749 cada</li>
+                    <li><strong>Total em dinheiro: R$ 0,827 por CPLE6</strong></li>
+                </ul>
+            </div>
+            
+            <div class="instructions">
+                <h3>📋 Como usar:</h3>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Digite os preços atuais</strong> de CPLE3 e CPLE6 nos campos amarelos</li>
+                    <li><strong>Veja instantaneamente</strong> qual opção é mais vantajosa</li>
+                    <li><strong>Spread negativo</strong> = CPLE6 mais barata (melhor opção)</li>
+                    <li><strong>Spread positivo</strong> = CPLE3 mais vantajosa</li>
+                </ol>
+            </div>
+            
+            <div class="share-section">
+                <h3>🔗 Para compartilhar esta calculadora:</h3>
+                <p>Salve esta página (Ctrl+S) e envie o arquivo HTML, ou hospede online gratuitamente:</p>
+                <div class="share-url">GitHub Pages • Netlify • Vercel</div>
+                <p style="font-size: 0.9em; color: #666; margin-top: 10px;">
+                    💡 <strong>Dica:</strong> Para uso em grupo, crie uma planilha Google Sheets com as fórmulas GOOGLEFINANCE para atualização automática das cotações.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const cple3 = parseFloat(document.getElementById('cple3').value);
+            const cple6 = parseFloat(document.getElementById('cple6').value);
+            
+            if (cple3 && cple6 && cple3 > 0 && cple6 > 0) {
+                const conversionValue = 0.827; // 1.067 × 0.7749
+                const theoretical = cple3 + conversionValue;
+                const spread = cple6 - theoretical;
+                const percentage = (spread / theoretical) * 100;
+                
+                // Atualizar valores
+                document.getElementById('theoretical').textContent = `R$ ${theoretical.toFixed(2)}`;
+                document.getElementById('spread').textContent = `R$ ${spread.toFixed(2)}`;
+                document.getElementById('percentage').textContent = `${percentage.toFixed(2)}%`;
+                
+                // Colorir os resultados
+                const spreadElement = document.getElementById('spread');
+                const percentageElement = document.getElementById('percentage');
+                const recommendationElement = document.getElementById('recommendation');
+                
+                if (spread < -0.01) { // CPLE6 vantajosa (desconto maior que 1 centavo)
+                    spreadElement.className = 'calculated-cell negative';
+                    percentageElement.className = 'calculated-cell negative';
+                    recommendationElement.className = 'recommendation-cell';
+                    recommendationElement.innerHTML = `🎯 <strong>CPLE6 VANTAJOSA!</strong><br>Desconto de ${Math.abs(percentage).toFixed(2)}% - Melhor manter/comprar CPLE6`;
+                } else if (spread > 0.01) { // CPLE3 vantajosa (prêmio maior que 1 centavo)
+                    spreadElement.className = 'calculated-cell positive';
+                    percentageElement.className = 'calculated-cell positive';
+                    recommendationElement.className = 'recommendation-cell cple3-better';
+                    recommendationElement.innerHTML = `🎯 <strong>CPLE3 VANTAJOSA!</strong><br>CPLE6 com prêmio de ${percentage.toFixed(2)}% - Melhor migrar para CPLE3`;
+                } else { // Preços equivalentes
+                    spreadElement.className = 'calculated-cell neutral';
+                    percentageElement.className = 'calculated-cell neutral';
+                    recommendationElement.className = 'recommendation-cell';
+                    recommendationElement.innerHTML = `⚖️ <strong>PREÇOS EQUIVALENTES</strong><br>Diferença insignificante - Qualquer uma das opções`;
+                }
+                
+                // Atualizar timestamp
+                const now = new Date();
+                document.getElementById('lastUpdated').textContent = 
+                    `Última atualização: ${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR')}`;
+                    
+            } else {
+                // Limpar resultados se não houver dados válidos
+                document.getElementById('theoretical').textContent = 'R$ 0,00';
+                document.getElementById('spread').textContent = 'R$ 0,00';
+                document.getElementById('percentage').textContent = '0,00%';
+                document.getElementById('recommendation').textContent = 'Digite os preços para ver a recomendação';
+                document.getElementById('recommendation').className = 'recommendation-cell';
+                document.getElementById('lastUpdated').textContent = 'Aguardando dados...';
+            }
+        }
+        
+        // Auto-focus no primeiro campo ao carregar
+        window.addEventListener('load', function() {
+            document.getElementById('cple3').focus();
+        });
+        
+        // Permitir Enter para pular para o próximo campo
+        document.getElementById('cple3').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('cple6').focus();
+            }
+        });
+        
+        document.getElementById('cple6').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.blur(); // Remove focus para mostrar resultado final
+            }
+        });
+    </script>
+</body>
+</html>
