@@ -1,22 +1,4 @@
-function copyToClipboard(elementId) {
-            const element = document.getElementById(elementId);
-            const text = element.textContent;
-            
-            navigator.clipboard.writeText(text).then(() => {
-                const button = element.nextElementSibling || element.previousElementSibling;
-                if (button && button.classList.contains('copy-btn')) {
-                    const originalText = button.textContent;
-                    button.textContent = 'Copiado!';
-                    button.style.background = '#28a745';
-                    setTimeout(() => {
-                        button.textContent = originalText;
-                        button.style.background = '#34a853';
-                    }, 2000);
-                }
-            }).catch(err => {
-                console.error('Erro ao copiar: ', err);
-            });
-        }<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
